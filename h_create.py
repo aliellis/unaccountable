@@ -11,7 +11,7 @@ import urlparse
 config = open("config.yml", "r")
 config = yaml.load(config)
 
-AUTH_TOKEN = config["auth_token"]
+AUTH_TOKEN = config["hipchat_auth_token"]
 ENDPOINT = "https://api.hipchat.com/v2/"
 
 
