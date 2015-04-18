@@ -10,14 +10,19 @@ import ipdb
 import urllib
 import urlparse
 
+with open("pk.pem", 'rb') as f:
+    private_key = f.read()
+    f.close()
+
 config = open("config.yml", "r")
 config = yaml.load(config)
 
 AUTH_TOKEN = config["slack_auth_token"]
 ENDPOINT = "https://slack.com/api/"
 
+
 def all_users():
-    # slack does not require full names, only way to get a comprehensive list 
+    # slack does not require full names, only way to get a comprehensive list
     # of users is to return email addresses
     url = ENDPOINT + "users.list?token=" + AUTH_TOKEN
     request = urllib2.Request(url)
