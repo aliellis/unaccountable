@@ -35,6 +35,7 @@ http = credentials.authorize(http)
 
 service = build('admin', 'directory_v1', http= http)
 
+
 def all_groups():
     """
     list all email groups
@@ -45,6 +46,7 @@ def all_groups():
         groups.append(group["email"])
     return groups
 
+
 def all_users():
     """
     list all user emails
@@ -54,6 +56,7 @@ def all_users():
     for user in r["users"]:
         users.append(user["primaryEmail"])
     return users
+
 
 def all_user_emails():
     """
@@ -66,12 +69,14 @@ def all_user_emails():
             emails.append(key.values()[-1].lower())
     return set(emails)
 
+
 def get_user_info(user):
     """
     - user: string, user email
     """
     r = service.users().get(userKey=user).execute()
     return r
+
 
 def get_group_members(group):
     """
@@ -82,7 +87,8 @@ def get_group_members(group):
     member_list = [user["email"] for user in members]
     return member_list
 
-def generate_user_template(user, domain_name, pass):
+
+def generate_user_template(user, domain_name, pw):
     """
     generates user template json necesssary to create a new user account
     - user: string, user's first and last name separated by whitespace
@@ -96,11 +102,12 @@ def generate_user_template(user, domain_name, pass):
                      "familyName": user.split()[1],
                      "fullName": user
                     },
-            "password": 'fakepassword',
+            "password": pw,
             "changePasswordAtNextLogin": True,
             "agreedToTerms": False
             }
     return json
+
 
 def add_aliases(user, aliases):
     """
@@ -110,6 +117,7 @@ def add_aliases(user, aliases):
     """
     for als in aliases:
         service.users().aliases().insert(userKey=user, body={"alias": als}).execute()
+
 
 def create_user(user, group, domain_name):
     """
@@ -128,9 +136,9 @@ def create_user(user, group, domain_name):
     valid_aliases = [validate_email(email, all_user_emails()) for email in desired_aliases if validate_email(email, all_user_emails()) is not None]
 
     create_user.execute()
-    # New accounts do not appear immediately, sleeping gives time for it to appear
-    # for the alias generation
-    print "user created, sleeping for 5 seconds...
+    # New accounts do not appear immediately, sleeping gives time for it to
+    # appear for the alias generation
+    print "user created, sleeping for 5 seconds..."
     time.sleep(5)
     print str(user) + "created"
     print "adding aliases..."
@@ -138,6 +146,7 @@ def create_user(user, group, domain_name):
     print "aliases created"
     print "account creation finished, printing results"
     pprint.pprint(get_user_info(user.split()[0].lower() + domain_name))
+
 
 # API doesn't let you set aliases at creation so you need to add them later
 def generate_aliases(user, domain_name):
@@ -153,6 +162,7 @@ def generate_aliases(user, domain_name):
               ]
     return aliases
 
+
 def validate_email(email, unavailable_emails):
     """
     checks to see if email is available
@@ -161,6 +171,7 @@ def validate_email(email, unavailable_emails):
     """
     if email not in unavailable_emails:
         return email
+
 
 def add_to_group(email, group):
     r = service.users().groups()
