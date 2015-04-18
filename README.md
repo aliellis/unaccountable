@@ -8,7 +8,7 @@ http://saxophonehorse.ytmnd.com/
 
 OAuth nonsense TBC
 
-Copy the sample config file below, and place it in the root folder, or run unaccountable.py and type 'configure'
+Copy the sample config file below, and place it in the root folder, or run `python unaccountable.py` and type 'configure'
 
 *config.yml*
 ```
