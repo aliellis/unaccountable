@@ -1,6 +1,9 @@
 import cmd
 import os.path
 
+from prettytable import PrettyTable
+from cmd_display import generate_table
+
 
 class Unaccountable(cmd.Cmd):
     prompt = "unaccountable: "
@@ -19,9 +22,6 @@ class Unaccountable(cmd.Cmd):
 
     def do_prompt(self, arg):
         self.prompt = arg
-
-    def do_help(self, arg):
-        return
 
     def do_configure(self, arg):
         # TODO: clean this up a little, ensure it writes strings as strings 
@@ -46,15 +46,18 @@ class Unaccountable(cmd.Cmd):
 
     def do_list_google_users(self, arg):
         import google_create as gc
-        print gc.all_users()
+        users = dict(Users=gc.all_users())
+        print generate_table(users)
 
     def do_list_slack_users(self, arg):
         import slack_create as sc
-        print sc.all_users()
+        users = dict(Users=sc.all_users())
+        print generate_table(users)
 
     def do_list_hipchat_users(self, arg):
         import hipchat_create as hc
-        print hc.all_users()
+        users = dict(Users=hc.all_users())
+        print generate_table(users)
 
 
 if __name__ == "__main__":
