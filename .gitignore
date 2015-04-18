@@ -2,3 +2,4 @@ config.yml
 *.pem
 client_secrets.json
 *.pyc
+*.DS_Store
