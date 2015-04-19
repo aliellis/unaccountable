@@ -3,8 +3,7 @@ import os.path
 
 from prettytable import PrettyTable
 from cmd_display import generate_table
-
-import ipdb
+import pprint
 
 
 class Colours:
@@ -55,6 +54,8 @@ class Unaccountable(cmd.Cmd):
             generate_config()
             print "config.yml created"
 
+    # Can combine all of these list and get_user_info functions
+
     def do_list_google_users(self, arg):
         import google_create as gc
         users = dict(Users=gc.all_users())
@@ -65,9 +66,36 @@ class Unaccountable(cmd.Cmd):
         print "Enter user email address"
         user = raw_input("> ")
         if gc.get_user_info(user):
-            print gc.get_user_info(user)
+            pprint.pprint(gc.get_user_info(user))
         else:
             print "Sorry, there is no record of a " + str(user) + " account in gmail"
+
+    def do_create_user(self, arg):
+        print "Which service would you like to create an account for?"
+        print "Google, Slack, Hipchat, Jira"
+        service = raw_input("> ")
+        if service.lower() == "google":
+            import google_create as gc
+
+            print "Would you like a user set up with default parameters, or custom?"
+            choice = raw_input("> ")
+            if choice.lower() == "default":
+                print "Please enter the user's first and last name:"
+                user_name = raw_input("> ")
+                gc.create_user(user_name)
+            elif choice.lower() == "custom":
+                return
+            else:
+                print "Error: please enter a valid service."
+
+        elif service.lower() == "slack":
+            print "Slack does not currently support account creation features via their API :("
+
+        elif service.lower() == "hipchat":
+            return
+
+        elif service.lower() == "jira":
+            return
 
     def do_list_slack_users(self, arg):
         import slack_create as sc
@@ -79,7 +107,7 @@ class Unaccountable(cmd.Cmd):
         print "Enter user email address"
         user = raw_input("> ")
         if sc.get_user_info(user):
-            print sc.get_user_info(user)
+            pprint.pprint(sc.get_user_info(user))
         else:
             print "Sorry, there is no record of a " + str(user) + " account in slack"
 
@@ -93,7 +121,7 @@ class Unaccountable(cmd.Cmd):
         print "Enter user email address"
         user = raw_input("> ")
         if hc.get_user_info(user):
-            print hc.get_user_info(user)
+            pprint.pprint(hc.get_user_info(user))
         else:
             print "Sorry, there is no record of a " + str(user) + " account in hipchat"
 
@@ -104,17 +132,11 @@ class Unaccountable(cmd.Cmd):
         services = ["google", "hipchat", "slack"]
         result = is_user_in(user, services)
 
-        # TODO: refacter table generation to make this less manual
-        from prettytable import PrettyTable
-        x = PrettyTable()
-        col_1= result.values()[0]
-        col_2 = result.values()[1]
-        col_3 = result.values()[2]
-        x.add_column(result.keys()[0], [str(col_1)])
-        x.add_column(result.keys()[1], [str(col_2)])
-        x.add_column(result.keys()[2], [str(col_3)])
-        x.align = 'l'
-        print x
+        # convert values to lists with strings
+        for key in result:
+            result[key] = [str(result[key])]
+
+        print generate_table(result)
 
 
 if __name__ == "__main__":
