@@ -7,19 +7,28 @@ from cmd_display import generate_table
 import ipdb
 
 
+class Colours:
+    PINK = '\033[95m'
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[31m'
+    END = '\033[0m'
+
+
 class Unaccountable(cmd.Cmd):
     prompt = "unaccountable: "
 
     def __init__(self):
         cmd.Cmd.__init__(self)
         print ""
-        print "{}{}".format("-", "~") * 40
+        print Colours.YELLOW + "{}{}".format("-", "~") * 40 + Colours.END
         print ""
-        print """Welcome to unaccountable, type 'help' for more information"""
+        print Colours.GREEN + """Welcome to unaccountable, type 'help' for more information""" 
         print ""
-        print "If you have not yet provided a configuration file, type 'configure'"
+        print "If you have not yet provided a configuration file, type 'configure'" + Colours.END
         print ""
-        print "{}{}".format("-", "~") * 40
+        print Colours.YELLOW + "{}{}".format("-", "~") * 40 + Colours.END
         print ""
 
     def do_prompt(self, arg):
@@ -65,14 +74,14 @@ class Unaccountable(cmd.Cmd):
         users = dict(Users=sc.all_users())
         print generate_table(users)
 
-    # def do_slack_user(self, arg):
-        # import slack_create as sc
-        # print "Enter user email address"
-        # user = raw_input("> ")
-        # if sc.get_user_info():
-        #     print sc.get_user_info(user)
-        # else:
-        #     print "Sorry, there is no record of a " + str(user) + "account in slack"
+    def do_slack_user(self, arg):
+        import slack_create as sc
+        print "Enter user email address"
+        user = raw_input("> ")
+        if sc.get_user_info(user):
+            print sc.get_user_info(user)
+        else:
+            print "Sorry, there is no record of a " + str(user) + " account in slack"
 
     def do_list_hipchat_users(self, arg):
         import hipchat_create as hc
@@ -87,14 +96,14 @@ class Unaccountable(cmd.Cmd):
             print hc.get_user_info(user)
         else:
             print "Sorry, there is no record of a " + str(user) + " account in hipchat"
-    
+
     def do_list_user_services(self, arg):
         from global_query import is_user_in
         print "Enter user email address"
         user = raw_input("> ")
         services = ["google", "hipchat"]
         result = is_user_in(user, services)
-        
+
         # TODO: refacter table generation to make this less manual
         from prettytable import PrettyTable
         x = PrettyTable()
