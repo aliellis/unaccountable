@@ -18,3 +18,19 @@ domain: "DOMAIN"
 hipchat_auth_token: "AUTHTOKEN"
 slack_auth_token: "AUTHTOKEN"
 ```
+
+##### Use
+
+###### Available Commands
+
+**`configure`** - *creates a config file from scratch or overwrites an existing one*
+
+**`list_google_users`** - *lists all google user accounts*
+
+**`google_user`** - *returns user data for specific google account*
+
+**`list_slack_users`** - *lists all slack user accounts*
+
+**`list_hipchat_users`** - *lists all hipchat user acccounts*
+
+**`hipchat_user`** - *returns user data for specific hipchat account*
