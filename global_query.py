@@ -19,6 +19,9 @@ def is_user_in(u_email, services):
         if service == "jira":
             print ""
         if service == "slack":
-            print ""
+            if sc.get_user_info(u_email):
+                res["slack"] = True
+            else:
+                res["slack"] = False
 
     return res

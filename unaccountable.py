@@ -101,7 +101,7 @@ class Unaccountable(cmd.Cmd):
         from global_query import is_user_in
         print "Enter user email address"
         user = raw_input("> ")
-        services = ["google", "hipchat"]
+        services = ["google", "hipchat", "slack"]
         result = is_user_in(user, services)
 
         # TODO: refacter table generation to make this less manual
@@ -109,8 +109,10 @@ class Unaccountable(cmd.Cmd):
         x = PrettyTable()
         col_1= result.values()[0]
         col_2 = result.values()[1]
+        col_3 = result.values()[2]
         x.add_column(result.keys()[0], [str(col_1)])
         x.add_column(result.keys()[1], [str(col_2)])
+        x.add_column(result.keys()[2], [str(col_3)])
         x.align = 'l'
         print x
 
