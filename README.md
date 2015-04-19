@@ -31,6 +31,8 @@ slack_auth_token: "AUTHTOKEN"
 
 **`list_slack_users`** - *lists all slack user accounts*
 
+**`slack_user`** - *returns user data for specific slack account*
+
 **`list_hipchat_users`** - *lists all hipchat user acccounts*
 
 **`hipchat_user`** - *returns user data for specific hipchat account*
