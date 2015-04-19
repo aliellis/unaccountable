@@ -36,8 +36,12 @@ def all_rooms():
 def get_user_info(user):
     url = ENDPOINT + "user/" + user + "?auth_token=" + AUTH_TOKEN
     request = urllib2.Request(url)
-    response = urllib2.urlopen(request)
-    return json.load(response)
+    try:
+        urllib2.urlopen(request)
+        return json.load(urllib2.urlopen(request))
+    except:
+        # TODO: handle these exceptions!
+        return False
 
 
 def get_room_members(group):

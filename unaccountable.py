@@ -49,15 +49,42 @@ class Unaccountable(cmd.Cmd):
         users = dict(Users=gc.all_users())
         print generate_table(users)
 
+    def do_google_user(self, arg):
+        import google_create as gc
+        print "Enter user email address"
+        user = raw_input("> ")
+        if gc.get_user_info(user):
+            print gc.get_user_info(user)
+        else:
+            print "Sorry, there is no record of a " + str(user) + " account in gmail"
+
     def do_list_slack_users(self, arg):
         import slack_create as sc
         users = dict(Users=sc.all_users())
         print generate_table(users)
+        
+    # def do_slack_user(self, arg):
+        # import slack_create as sc
+        # print "Enter user email address"
+        # user = raw_input("> ")
+        # if sc.get_user_info():
+        #     print sc.get_user_info(user)
+        # else:
+        #     print "Sorry, there is no record of a " + str(user) + "account in slack"
 
     def do_list_hipchat_users(self, arg):
         import hipchat_create as hc
         users = dict(Users=hc.all_users())
         print generate_table(users)
+
+    def do_hipchat_user(self, arg):
+        import hipchat_create as hc
+        print "Enter user email address"
+        user = raw_input("> ")
+        if hc.get_user_info(user):
+            print hc.get_user_info(user)
+        else:
+            print "Sorry, there is no record of a " + str(user) + " account in hipchat"
 
 
 if __name__ == "__main__":

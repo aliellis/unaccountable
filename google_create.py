@@ -4,6 +4,7 @@ import httplib2
 import json
 import yaml
 import pprint
+import urllib2
 
 from apiclient import errors
 from apiclient.discovery import build
@@ -74,8 +75,13 @@ def get_user_info(user):
     """
     - user: string, user email
     """
-    r = service.users().get(userKey=user).execute()
-    return r
+    r = service.users().get(userKey=user)
+    try:
+        return r.execute()
+        # return service.user().get(userKey=use
+    except:
+        # TODO: handle 404 exceptions as that means there is not user
+        return False
 
 
 def get_group_members(group):
