@@ -4,6 +4,8 @@ import os.path
 from prettytable import PrettyTable
 from cmd_display import generate_table
 
+import ipdb
+
 
 class Unaccountable(cmd.Cmd):
     prompt = "unaccountable: "
@@ -62,7 +64,7 @@ class Unaccountable(cmd.Cmd):
         import slack_create as sc
         users = dict(Users=sc.all_users())
         print generate_table(users)
-        
+
     # def do_slack_user(self, arg):
         # import slack_create as sc
         # print "Enter user email address"
@@ -85,6 +87,23 @@ class Unaccountable(cmd.Cmd):
             print hc.get_user_info(user)
         else:
             print "Sorry, there is no record of a " + str(user) + " account in hipchat"
+    
+    def do_list_user_services(self, arg):
+        from global_query import is_user_in
+        print "Enter user email address"
+        user = raw_input("> ")
+        services = ["google", "hipchat"]
+        result = is_user_in(user, services)
+        
+        # TODO: refacter table generation to make this less manual
+        from prettytable import PrettyTable
+        x = PrettyTable()
+        col_1= result.values()[0]
+        col_2 = result.values()[1]
+        x.add_column(result.keys()[0], [str(col_1)])
+        x.add_column(result.keys()[1], [str(col_2)])
+        x.align = 'l'
+        print x
 
 
 if __name__ == "__main__":
