@@ -3,6 +3,7 @@ import hipchat_create as hc
 import jira_create as jc
 import slack_create as sc
 
+
 def is_user_in(u_email, services):
     res = dict.fromkeys(services)
     for service in set(services):
