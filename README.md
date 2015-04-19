@@ -1,6 +1,6 @@
 # unaccountable
 
-#### Under construction, check back later!
+#### Under construction, this readme is purely for development purposes, check back later!
 
 http://saxophonehorse.ytmnd.com/
 
@@ -34,3 +34,5 @@ slack_auth_token: "AUTHTOKEN"
 **`list_hipchat_users`** - *lists all hipchat user acccounts*
 
 **`hipchat_user`** - *returns user data for specific hipchat account*
+
+**`list_user_services`** - *returns current user membership of all services*
