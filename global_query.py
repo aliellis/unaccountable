@@ -31,19 +31,18 @@ def is_user_in(u_email, services):
 def is_user_admin_in(u_email, services):
     all_services = is_user_in(u_email, services)
     valid_services = [service for service, value in all_services.iteritems() if value is True]
+    res = dict.fromkeys(services)
 
     for service in valid_services:
         if service == "google":
-            print "GOOGLE"
-            res = gc.get_user_info(u_email)
-            print "Is Delegated Admin: " + str(res["isDelegatedAdmin"])
-            print "Is Admin: " + str(res["isAdmin"])
-            print "======"
+            google_q = gc.get_user_info(u_email)
+            # Google has 2 defined admin roles, might need to expand this function
+            if google_q["isDelegatedAdmin"] or google_q["isAdmin"]:
+                res["google"] = True
+            else:
+                res["google"] = False
         elif service == "slack":
-            print "SLACK"
-            print sc.get_user_info(u_email)["is_admin"]
-            print "======"
+            res["slack"] = sc.get_user_info(u_email)["is_admin"]
         elif service == "hipchat":
-            print "HIPCHAT"
-            print hc.get_user_info(u_email)["is_group_admin"]
-            print "======"
+            res["hipchat"] = hc.get_user_info(u_email)["is_group_admin"]
+    return res

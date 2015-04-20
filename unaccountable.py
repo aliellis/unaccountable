@@ -172,7 +172,6 @@ class Unaccountable(cmd.Cmd):
         # convert values to lists with strings
         for key in result:
             result[key] = [str(result[key])]
-
         print generate_table(result)
 
     def do_is_admin(self, arg):
@@ -180,7 +179,12 @@ class Unaccountable(cmd.Cmd):
         print "Enter user email address"
         user = raw_input("> ")
         services = ["google", "hipchat", "slack"]
-        is_user_admin_in(user, services)
+        result = is_user_admin_in(user, services)
+
+        # convert values to lists with strings
+        for key in result:
+            result[key] = [str(result[key])]
+        print generate_table(result)
 
 
 if __name__ == "__main__":
