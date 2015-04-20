@@ -175,6 +175,13 @@ class Unaccountable(cmd.Cmd):
 
         print generate_table(result)
 
+    def do_is_admin(self, arg):
+        from global_query import is_user_admin_in
+        print "Enter user email address"
+        user = raw_input("> ")
+        services = ["google", "hipchat", "slack"]
+        is_user_admin_in(user, services)
+
 
 if __name__ == "__main__":
     Unaccountable().cmdloop()
