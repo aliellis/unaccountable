@@ -12,11 +12,14 @@ Copy the sample config file below, and place it in the root folder, or run `pyth
 
 *config.yml*
 ```
+google_private_key_path: "/path/to/private/keyfile.p12"
 service_account_email: "SOMETHING@dGOOGLE-DEVELOPER-ACCOUNT"
 service_user_email: "USER@GOOGLEDOMAIN"
 domain: "DOMAIN"
 hipchat_auth_token: "AUTHTOKEN"
 slack_auth_token: "AUTHTOKEN"
+g_user_pw: "DEFAULT-GOOGLE-PASSWORD"
+h_user_pw: "DEFAULT-HIPCHAT-PASSWORD"
 ```
 
 ##### Use
