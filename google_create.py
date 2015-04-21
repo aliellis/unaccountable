@@ -12,12 +12,12 @@ from oauth2client.client import OAuth2WebServerFlow
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import SignedJwtAssertionCredentials
 
-with open("pk.pem", 'rb') as f:
-    private_key = f.read()
-    f.close()
-
 config = open("config.yml", "r")
 config = yaml.load(config)
+
+with open(config["google_private_key_path"], 'rb') as p_key:
+    private_key = p_key.read()
+    p_key.close()
 
 SERVICE_ACCOUNT_EMAIL = config["service_account_email"]
 SERVICE_USER_EMAIL = config["service_user_email"]
@@ -25,6 +25,8 @@ SERVICE_DOMAIN = config["domain"]
 USER_PW = config["g_user_pw"]
 
 http = httplib2.Http()
+# Sub account is needed to fulfill these actions
+# http://stackoverflow.com/questions/20704925/google-admin-sdk-directory-api-403-python
 credentials = SignedJwtAssertionCredentials(
                                             SERVICE_ACCOUNT_EMAIL,
                                             private_key,
