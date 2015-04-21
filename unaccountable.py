@@ -34,7 +34,7 @@ class Unaccountable(cmd.Cmd):
         self.prompt = arg
 
     def do_configure(self, arg):
-        # TODO: clean this up a little, ensure it writes strings as strings 
+        # TODO: clean this up a little, ensure it writes strings as strings
         # and ints as ints
         from generate_config import generate_config
 

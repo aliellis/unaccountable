@@ -44,7 +44,7 @@ def all_groups():
     """
     list all email groups
     """
-    r = service.groups().list(domain= SERVICE_DOMAIN).execute()
+    r = service.groups().list(domain=SERVICE_DOMAIN, maxResults=500).execute()
     groups = []
     for group in r["groups"]:
         groups.append(group["email"])
@@ -55,7 +55,7 @@ def all_users():
     """
     list all user emails
     """
-    r = service.users().list(domain= SERVICE_DOMAIN).execute()
+    r = service.users().list(domain=SERVICE_DOMAIN, maxResults=500).execute()
     users = []
     for user in r["users"]:
         users.append(user["primaryEmail"])
@@ -66,7 +66,7 @@ def all_user_emails():
     """
     lists all user emails, including aliases
     """
-    r = service.users().list(domain= SERVICE_DOMAIN).execute()
+    r = service.users().list(domain=SERVICE_DOMAIN, maxResults=500).execute()
     emails = []
     for user in r["users"]:
         for key in user["emails"]:
@@ -91,7 +91,7 @@ def get_group_members(group):
     """
     - group: string, group email
     """
-    r = service.members().list(groupKey=group).execute()
+    r = service.members().list(groupKey=group, maxResults=500).execute()
     members = r["members"]
     member_list = [user["email"] for user in members]
     return member_list
