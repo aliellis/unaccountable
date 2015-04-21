@@ -1,4 +1,5 @@
 config.yml
+*.p12
 *.pem
 client_secrets.json
 *.pyc
