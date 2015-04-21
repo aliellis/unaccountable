@@ -28,6 +28,11 @@ def is_user_in(u_email, services):
     return res
 
 
+def services_user_is_in(u_email, all_services):
+    all_services = is_user_in(u_email, all_services)
+    return [service for service, value in all_services.iteritems() if value is True]
+
+
 def is_user_admin_in(u_email, services):
     all_services = is_user_in(u_email, services)
     valid_services = [service for service, value in all_services.iteritems() if value is True]
@@ -45,4 +50,18 @@ def is_user_admin_in(u_email, services):
             res["slack"] = sc.get_user_info(u_email)["is_admin"]
         elif service == "hipchat":
             res["hipchat"] = hc.get_user_info(u_email)["is_group_admin"]
+    return res
+
+
+def all_priveliges(u_email, all_services):
+    v_services = services_user_is_in(u_email, all_services)
+    res = dict.fromkeys(v_services)
+
+    for service in v_services:
+        if service == "google":
+            res["google"] = gc.get_user_info(u_email)
+        elif service == "slack":
+            res["slack"] = sc.get_user_info(u_email)
+        elif service == "hipchat":
+            res["hipchat"] = hc.get_user_info(u_email)
     return res
