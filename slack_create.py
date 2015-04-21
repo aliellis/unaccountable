@@ -10,10 +10,6 @@ import ipdb
 import urllib
 import urlparse
 
-with open("pk.pem", 'rb') as f:
-    private_key = f.read()
-    f.close()
-
 config = open("config.yml", "r")
 config = yaml.load(config)
 
