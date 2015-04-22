@@ -4,6 +4,11 @@ import os.path
 from prettytable import PrettyTable
 from cmd_display import generate_table
 import pprint
+import yaml
+
+from services.hipchat import Hipchat
+from services.slack import Slack
+from services.google import Google
 
 
 class Colours:
@@ -20,18 +25,60 @@ class Unaccountable(cmd.Cmd):
 
     def __init__(self):
         cmd.Cmd.__init__(self)
+
+        config = open("config.yml", "r")
+        config = yaml.load(config)
+
+        # TODO: we should probably auto load these
+        self.services = {
+            "hipchat": Hipchat(config),
+            "slack": Slack(config),
+            "google": Google(config)
+        }
+
         print ""
-        print Colours.YELLOW + "{}{}".format("-", "~") * 40 + Colours.END
+        print "{}{}".format("-", "~") * 40
         print ""
-        print Colours.GREEN + """Welcome to unaccountable, type 'help' for more information""" 
+        print """Welcome to unaccountable, type 'help' for more information"""
         print ""
-        print "If you have not yet provided a configuration file, type 'configure'" + Colours.END
+        print "If you have not yet provided a configuration file, type 'configure'"
         print ""
-        print Colours.YELLOW + "{}{}".format("-", "~") * 40 + Colours.END
+        print "{}{}".format("-", "~") * 40
         print ""
 
     def do_prompt(self, arg):
         self.prompt = arg
+
+    def do_get_users(self, arg):
+        cmds = arg.split()
+        if len(cmds) == 0 or cmds[0] not in self.services:
+            print("Please specify a valid service")
+            return
+
+        service = self.services[cmds[0]]
+        users = {"Users": service.all_users()}
+        print(generate_table(users))
+
+    def do_get_user(self, arg):
+        cmds = arg.split()
+        if len(cmds) == 0 or cmds[0] not in self.services:
+            print("Please specify a valid service")
+            return
+
+        service = self.services[cmds[0]]
+        if len(cmds) > 1:
+            pprint.pprint(service.get_user(cmds[1]))
+        else:
+            user = raw_input("Please enter a valid email address: ")
+            pprint.pprint(service.get_user(user))
+
+    def do_create_user(self, arg):
+        cmds = arg.split()
+        if len(cmds) == 0 or cmds[0] != "google" or "hipchat":
+            print("Please specify a valid service")
+            return
+
+        service = self.services[cmds[0]]
 
     def do_configure(self, arg):
         # TODO: clean this up a little, ensure it writes strings as strings
@@ -93,20 +140,6 @@ class Unaccountable(cmd.Cmd):
             else:
                 print "Sorry, there is no record of a " + str(user) + " account in hipchat"
 
-    def do_list_google_users(self, arg):
-        import google_create as gc
-        users = dict(Users=gc.all_users())
-        print generate_table(users)
-
-    def do_google_user(self, arg):
-        import google_create as gc
-        print "Enter user email address"
-        user = raw_input("> ")
-        if gc.get_user_info(user):
-            pprint.pprint(gc.get_user_info(user))
-        else:
-            print "Sorry, there is no record of a " + str(user) + " account in gmail"
-
     def do_create_user(self, arg):
         print "Which service would you like to create an account for?"
         print "Google, Slack, Hipchat, Jira"
@@ -133,34 +166,6 @@ class Unaccountable(cmd.Cmd):
 
         elif service.lower() == "jira":
             return
-
-    def do_list_slack_users(self, arg):
-        import slack_create as sc
-        users = dict(Users=sc.all_users())
-        print generate_table(users)
-
-    def do_slack_user(self, arg):
-        import slack_create as sc
-        print "Enter user email address"
-        user = raw_input("> ")
-        if sc.get_user_info(user):
-            pprint.pprint(sc.get_user_info(user))
-        else:
-            print "Sorry, there is no record of a " + str(user) + " account in slack"
-
-    def do_list_hipchat_users(self, arg):
-        import hipchat_create as hc
-        users = dict(Users=hc.all_users())
-        print generate_table(users)
-
-    def do_hipchat_user(self, arg):
-        import hipchat_create as hc
-        print "Enter user email address"
-        user = raw_input("> ")
-        if hc.get_user_info(user):
-            pprint.pprint(hc.get_user_info(user))
-        else:
-            print "Sorry, there is no record of a " + str(user) + " account in hipchat"
 
     def do_list_user_services(self, arg):
         from global_query import is_user_in
