@@ -4,6 +4,8 @@ import urllib2
 import yaml
 import time
 from fn_cache import Memoized
+import requests
+from urllib import urlencode
 
 import ipdb
 
@@ -16,6 +18,12 @@ config = yaml.load(config)
 AUTH_TOKEN = config["hipchat_auth_token"]
 USER_PW = config["h_user_pw"]
 ENDPOINT = "https://api.hipchat.com/v2/"
+
+""" NOTE: Due to rate limiting, and the way HipChat handles user info requests,
+    it is currently impossible to fetch ALL user data within a reasonable amount
+    of time, this is because the 'user?'' call only returns about 1/2 of the 
+    actual user information, crucially, the user's email address 
+"""
 
 
 def all_users():
@@ -68,56 +76,18 @@ def url_fix(s, charset='utf-8'):
     return urlparse.urlunsplit((scheme, netloc, path, qs, anchor))
 
 
-def detect_duplicate():
-    return
-
-@Memoized
-def all_user_info():
-    # full json response for all users
-    url = ENDPOINT + "user?auth_token=" + AUTH_TOKEN
-    request = urllib2.Request(url)
-    response = urllib2.urlopen(request)
-    response = json.load(response)
-    return response["items"]
-
-
-def generate_unique_identifiers():
-    res = {
-           "mention_name": [],
-           "email": [],
-           "name": []
-          }
-
-    print "Generating..."
-    all_info = all_user_info()
-    for user in all_info:
-        # import ipdb
-        # ipdb.set_trace()
-        print "adding uniques from " + user["name"]
-        res["email"].append(get_user_info(str(user["id"]))["email"])
-        res["mention_name"].append(user["mention_name"])
-        res["name"].append(user["name"])
-        print "uniques added, sleeping for 20 seconds to avoid rate limiting"
-        # time.sleep(20)
-    return res
-
-# @Memoized
-# def fibonacci(n):
-#     "Return the nth fibonacci number."
-#     if n in (0, 1):
-#         return n
-#     return fibonacci(n-1) + fibonacci(n-2)
-# 
-# print fibonacci(12)
-
-
-    # json = {
-    #         "email": 'test',
-    #         "name:" 'test',
-    #         "mention_name": 'test',
-    #         "password": 'test'
-    #        }
-    # return json
-
-
-print generate_unique_identifiers()
+def create_user(user_email, user_name, user_mention, pw=None):
+    if pw is None:
+        pw = USER_PW
+    host = "api.hipchat.com"
+    url = "https://{0}/v2/user".format(host)
+    headers = {'Content-type': 'application/json'}
+    headers['Authorization'] = "Bearer " + AUTH_TOKEN
+    params = {"auth_token": AUTH_TOKEN}
+    payload = {
+        'email': user_email,
+        'name': user_name,
+        'mention_name': user_mention,
+        'password': pw
+    }
+    requests.post(url, params=params, data=json.dumps(payload), headers=headers)
