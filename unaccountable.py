@@ -9,6 +9,7 @@ import yaml
 from services.hipchat import Hipchat
 from services.slack import Slack
 from services.google import Google
+from global_query import is_user_in
 
 
 class Colours:
@@ -61,16 +62,30 @@ class Unaccountable(cmd.Cmd):
 
     def do_get_user(self, arg):
         cmds = arg.split()
-        if len(cmds) == 0 or cmds[0] not in self.services:
-            print("Please specify a valid service")
+        if len(cmds) == 0:
+            print("Please specify a valid service or email address")
             return
 
-        service = self.services[cmds[0]]
-        if len(cmds) > 1:
-            pprint.pprint(service.get_user(cmds[1]))
+        elif "@" in cmds[0]:
+            # TODO: finish this
+            return
+            # result = is_user_in(user, self.services)
+
+            # convert values to lists with strings, move this out to table_helpers
+            # for key in result:
+            #     result[key] = [str(result[key])]
+            # print generate_table(result)
+
+        elif cmds[0] not in self.services:
+            print("Please specify a valid service")
+
         else:
-            user = raw_input("Please enter a valid email address: ")
-            pprint.pprint(service.get_user(user))
+            service = self.services[cmds[0]]
+            if len(cmds) > 1:
+                pprint.pprint(service.get_user(cmds[1]))
+            else:
+                user = raw_input("Please enter a valid email address: ")
+                pprint.pprint(service.get_user(user))
 
     def do_create_user(self, arg):
         cmds = arg.split()
