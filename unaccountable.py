@@ -10,7 +10,7 @@ from services.hipchat import Hipchat
 from services.slack import Slack
 from services.google import Google
 from services.asana import Asana
-from global_query import is_user_in
+from global_query import MultiQuery
 
 
 class Colours:
@@ -38,6 +38,8 @@ class Unaccountable(cmd.Cmd):
             "google": Google(config),
             "asana": Asana(config)
         }
+
+        self.multi_q = MultiQuery(config)
 
         print ""
         print "{}{}".format("-", "~") * 40
@@ -69,14 +71,14 @@ class Unaccountable(cmd.Cmd):
             return
 
         elif "@" in cmds[0]:
-            # TODO: finish this
-            return
-            # result = is_user_in(user, self.services)
+            res = self.multi_q.is_user(cmds[0])
 
             # convert values to lists with strings, move this out to table_helpers
-            # for key in result:
-            #     result[key] = [str(result[key])]
-            # print generate_table(result)
+            for k in res:
+                res[k] = [str(res[k])]
+            print generate_table(res)
+
+        # maybe check for 2 more args to support search by name?
 
         elif cmds[0] not in self.services:
             print("Please specify a valid service")
