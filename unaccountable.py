@@ -9,6 +9,7 @@ import yaml
 from services.hipchat import Hipchat
 from services.slack import Slack
 from services.google import Google
+from services.asana import Asana
 from global_query import is_user_in
 
 
@@ -34,7 +35,8 @@ class Unaccountable(cmd.Cmd):
         self.services = {
             "hipchat": Hipchat(config),
             "slack": Slack(config),
-            "google": Google(config)
+            "google": Google(config),
+            "asana": Asana(config)
         }
 
         print ""
