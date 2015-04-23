@@ -22,7 +22,7 @@ with open(config["google_private_key_path"], 'rb') as p_key:
 SERVICE_ACCOUNT_EMAIL = config["service_account_email"]
 SERVICE_USER_EMAIL = config["service_user_email"]
 SERVICE_DOMAIN = config["domain"]
-USER_PW = config["g_user_pw"]
+USER_PW = config["google_user_pass"]
 
 http = httplib2.Http()
 # Sub account is needed to fulfill these actions

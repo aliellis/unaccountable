@@ -7,7 +7,7 @@ def generate_config():
     s_auth = raw_input("Slack AuthToken: ")
     g_userpw = raw_input("Default password for new Google accounts: ")
     h_userpw = raw_input("Default password for new HipChat accounts: ")
-    
+
     keys = ["google_private_key_path", "service_account_email: ",
             "service_user_email: ", "domain: ", "hipchat_auth_token: ",
             "slack_auth_token: ", "g_user_pw", "h_user_pw"]

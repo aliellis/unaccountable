@@ -2,6 +2,7 @@ import json
 import urllib2
 import urllib
 import urlparse
+import requests
 
 
 """ NOTE: Due to rate limiting, and the way HipChat handles user info requests,

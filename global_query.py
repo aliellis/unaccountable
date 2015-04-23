@@ -1,7 +1,6 @@
-import google_create as gc
-import hipchat_create as hc
-import jira_create as jc
-import slack_create as sc
+# import google_create as gc
+# import hipchat_create as hc
+# import jira_create as jc
 
 
 def is_user_in(u_email, services):
