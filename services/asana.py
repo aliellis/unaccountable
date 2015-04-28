@@ -32,3 +32,13 @@ class Asana():
         auth = self.auth_token
         r = requests.get(url, auth=(auth, ""))
         return json.loads(r.text)
+
+    def get_teams(self):
+        workspace_id = self.all_workspaces()["data"][0]["id"]
+        url = "{}organizations/{}/teams".format(self.endpoint, workspace_id)
+        auth = self.auth_token
+        r = requests.get(url, auth=(auth, ""))
+        return json.loads(r.text)
+
+
+        # https://app.asana.com/api/1.0/organizations/13523/teams

@@ -207,6 +207,9 @@ class Unaccountable(cmd.Cmd):
             task_ids = [task_id["id"] for task_id in self.services["asana"].get_task_ids(cmds[0])["data"]]
             pprint.pprint([self.services["asana"].get_task_info(t)["data"] for t in task_ids])
 
+    def do_get_teams(self, arg):
+        print [team["name"] for team in self.services["asana"].get_teams()["data"]]
+
     def do_is_admin(self, arg):
         from global_query import is_user_admin_in
         print "Enter user email address"
