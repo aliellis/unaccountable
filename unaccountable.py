@@ -186,17 +186,26 @@ class Unaccountable(cmd.Cmd):
         elif service.lower() == "jira":
             return
 
-    def do_list_user_services(self, arg):
-        from global_query import is_user_in
-        print "Enter user email address"
-        user = raw_input("> ")
-        services = ["google", "hipchat", "slack"]
-        result = is_user_in(user, services)
+    # def do_list_user_services(self, arg):
+    #     from global_query import is_user_in
+    #     print "Enter user email address"
+    #     user = raw_input("> ")
+    #     services = ["google", "hipchat", "slack"]
+    #     result = is_user_in(user, services)
+    # 
+    #     # convert values to lists with strings
+    #     for key in result:
+    #         result[key] = [str(result[key])]
+    #     print generate_table(result)
 
-        # convert values to lists with strings
-        for key in result:
-            result[key] = [str(result[key])]
-        print generate_table(result)
+    def do_get_tasks(self, arg):
+        cmds = arg.split()
+        if len(cmds) == 0:
+            print("Please specify a user email")
+            return
+        else:
+            task_ids = [task_id["id"] for task_id in self.services["asana"].get_task_ids(cmds[0])["data"]]
+            pprint.pprint([self.services["asana"].get_task_info(t)["data"] for t in task_ids])
 
     def do_is_admin(self, arg):
         from global_query import is_user_admin_in
