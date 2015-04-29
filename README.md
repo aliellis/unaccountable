@@ -28,16 +28,15 @@ h_user_pw: "DEFAULT-HIPCHAT-PASSWORD"
 
 **`configure`** - *creates a config file from scratch or overwrites an existing one*
 
-**`list_google_users`** - *lists all google user accounts*
+**`get_users [SERVICE]`** - *lists all users in a service*
 
-**`google_user`** - *returns user data for specific google account*
+**`get_user [SERVICE]`** - *returns user data from specified service*
 
-**`list_slack_users`** - *lists all slack user accounts*
+**`get_user [USER_EMAIL]`** - *queries all services for that user account, returns a table of results
+                               (booleans only)*
 
-**`slack_user`** - *returns user data for specific slack account*
+**`user_manifest [USER_EMAIL]`** - *returns all user data from all services which contain a record of
+                                    that email address*
 
-**`list_hipchat_users`** - *lists all hipchat user acccounts*
-
-**`hipchat_user`** - *returns user data for specific hipchat account*
-
-**`list_user_services`** - *returns current user membership of all services*
+**`is_admin [USER_EMAIL]`** - *Returns a table of services (booleans only) specifying admin priveliges for
+                               that account*
