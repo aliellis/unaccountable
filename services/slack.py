@@ -36,3 +36,10 @@ class Slack():
             if user["deleted"] is False and user["is_bot"] is False:
                 if u_email in user["profile"]["email"]:
                     return user
+
+    def is_user_admin(self, u_email):
+        try:
+            if self.get_user(u_email)["is_admin"] is True:
+                return True
+        except:
+            False

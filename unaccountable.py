@@ -64,6 +64,17 @@ class Unaccountable(cmd.Cmd):
         users = {"Users": service.all_users()}
         print(generate_table(users))
 
+    def do_is_admin(self, arg):
+        cmds = arg.split()
+        if len(cmds) == 0:
+            print("Please enter a valid email address")
+            return
+
+        res = self.multi_q.is_user_admin(cmds[0])
+        for k in res:
+            res[k] = [str(res[k])]
+        print generate_table(res)
+
     def do_get_user(self, arg):
         cmds = arg.split()
         if len(cmds) == 0:
@@ -186,18 +197,6 @@ class Unaccountable(cmd.Cmd):
         elif service.lower() == "jira":
             return
 
-    # def do_list_user_services(self, arg):
-    #     from global_query import is_user_in
-    #     print "Enter user email address"
-    #     user = raw_input("> ")
-    #     services = ["google", "hipchat", "slack"]
-    #     result = is_user_in(user, services)
-    # 
-    #     # convert values to lists with strings
-    #     for key in result:
-    #         result[key] = [str(result[key])]
-    #     print generate_table(result)
-
     def do_get_tasks(self, arg):
         cmds = arg.split()
         if len(cmds) == 0:
@@ -223,18 +222,6 @@ class Unaccountable(cmd.Cmd):
 
                     raw_users = self.services["asana"].get_team_members(team_id)["data"]
                     print [user["name"] for user in raw_users]
-
-    def do_is_admin(self, arg):
-        from global_query import is_user_admin_in
-        print "Enter user email address"
-        user = raw_input("> ")
-        services = ["google", "hipchat", "slack"]
-        result = is_user_admin_in(user, services)
-
-        # convert values to lists with strings
-        for key in result:
-            result[key] = [str(result[key])]
-        print generate_table(result)
 
 
 if __name__ == "__main__":

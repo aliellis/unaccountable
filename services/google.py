@@ -41,9 +41,14 @@ class Google():
         r = self.directory_api.users().get(userKey=user)
         try:
             return r.execute()
-            # return service.user().get(userKey=use
         except:
-            # TODO: handle 404 exceptions as that means there is not user
+            return False
+
+    def is_user_admin(self, user):
+        try:
+            if (self.get_user(user)["isAdmin"] | self.get_user(user)["isDelegatedAdmin"]):
+                return True
+        except:
             return False
 
     def create_user(self, user):

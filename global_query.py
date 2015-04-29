@@ -22,30 +22,17 @@ class MultiQuery():
                 res[k] = False
         return res
 
-# def services_user_is_in(u_email, all_services):
-#     all_services = is_user_in(u_email, all_services)
-#     return [service for service, value in all_services.iteritems() if value is True]
-# 
-# 
-# def is_user_admin_in(u_email, services):
-#     all_services = is_user_in(u_email, services)
-#     valid_services = [service for service, value in all_services.iteritems() if value is True]
-#     res = dict.fromkeys(services)
-# 
-#     for service in valid_services:
-#         if service == "google":
-#             google_q = gc.get_user_info(u_email)
-#             # Google has 2 defined admin roles, might need to expand this function
-#             if google_q["isDelegatedAdmin"] or google_q["isAdmin"]:
-#                 res["google"] = True
-#             else:
-#                 res["google"] = False
-#         elif service == "slack":
-#             res["slack"] = sc.get_user_info(u_email)["is_admin"]
-#         elif service == "hipchat":
-#             res["hipchat"] = hc.get_user_info(u_email)["is_group_admin"]
-#     return res
-# 
+    def is_user_admin(self, u_email):
+        admin_s = ["slack", "hipchat", "google"]
+        res = dict.fromkeys(admin_s)
+        for service in admin_s:
+            if self.services[service].is_user_admin(u_email):
+                res[service] = True
+            else:
+                res[service] = False
+        return res
+
+
 # 
 # def all_priveliges(u_email, all_services):
 #     v_services = services_user_is_in(u_email, all_services)

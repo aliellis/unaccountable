@@ -8,7 +8,9 @@ import requests
 """ NOTE: Due to rate limiting, and the way HipChat handles user info requests,
     it is currently impossible to fetch ALL user data within a reasonable amount
     of time, this is because the 'user?'' call only returns about 1/2 of the 
-    actual user information, crucially, the user's email address 
+    actual user information, crucially, most calls require 2 calls to the api,
+    one with the user's email to fetch their unique id, and then again with that
+    id to return the user's full profile.
 """
 
 
@@ -44,7 +46,13 @@ class Hipchat():
             urllib2.urlopen(request)
             return json.load(urllib2.urlopen(request))
         except:
-            # TODO: handle these exceptions!
+            return False
+
+    def is_user_admin(self, user):
+        try:
+            if self.get_user(user)["is_group_admin"] is True:
+                return True
+        except:
             return False
 
     def create_user(user_email, user_name, user_mention, pw=None):
