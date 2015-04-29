@@ -17,8 +17,11 @@ class Asana():
     def get_user(self, user):
         url = "{}users/{}".format(self.endpoint, user)
         auth = self.auth_token
-        r = requests.get(url, auth=(auth, ""))
-        return json.loads(r.text)["data"]
+        try:
+            requests.get(url, auth=(auth, ""))
+            return json.loads(requests.get(url, auth=(auth, "")).text)["data"]
+        except:
+            return False
 
     def all_workspaces(self):
         url = "{}workspaces".format(self.endpoint)

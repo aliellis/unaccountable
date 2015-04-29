@@ -9,8 +9,7 @@ class MultiQuery():
             "hipchat": Hipchat(config),
             "slack": Slack(config),
             "google": Google(config),
-            # TODO: need get_user fun for asana
-            # "asana": Asana(config)
+            "asana": Asana(config)
         }
 
     def is_user(self, u_email):
