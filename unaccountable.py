@@ -210,6 +210,20 @@ class Unaccountable(cmd.Cmd):
     def do_get_teams(self, arg):
         print [team["name"] for team in self.services["asana"].get_teams()["data"]]
 
+    def do_get_members(self, arg):
+        cmds = arg.split()
+        if len(cmds) == 0:
+            print("Please specify a Asana team")
+            return
+        else:
+            raw_teams = self.services["asana"].get_teams()["data"]
+            for team in raw_teams:
+                if cmds[0] in team["name"]:
+                    team_id = team["id"]
+
+                    raw_users = self.services["asana"].get_team_members(team_id)["data"]
+                    print [user["name"] for user in raw_users]
+
     def do_is_admin(self, arg):
         from global_query import is_user_admin_in
         print "Enter user email address"

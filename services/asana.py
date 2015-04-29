@@ -40,5 +40,8 @@ class Asana():
         r = requests.get(url, auth=(auth, ""))
         return json.loads(r.text)
 
-
-        # https://app.asana.com/api/1.0/organizations/13523/teams
+    def get_team_members(self, team_id):
+        url = "{}teams/{}/users".format(self.endpoint, team_id)
+        auth = self.auth_token
+        r = requests.get(url, auth=(auth, ""))
+        return json.loads(r.text)
