@@ -75,6 +75,14 @@ class Unaccountable(cmd.Cmd):
             res[k] = [str(res[k])]
         print generate_table(res)
 
+    def do_user_manifest(self, arg):
+        cmds = arg.split()
+        if len(cmds) == 0:
+            print("Please specify a valid service or email address")
+            return
+
+        pprint.pprint(self.multi_q.all_priveliges(cmds[0]))
+
     def do_get_user(self, arg):
         cmds = arg.split()
         if len(cmds) == 0:

@@ -32,17 +32,8 @@ class MultiQuery():
                 res[service] = False
         return res
 
-
-# 
-# def all_priveliges(u_email, all_services):
-#     v_services = services_user_is_in(u_email, all_services)
-#     res = dict.fromkeys(v_services)
-# 
-#     for service in v_services:
-#         if service == "google":
-#             res["google"] = gc.get_user_info(u_email)
-#         elif service == "slack":
-#             res["slack"] = sc.get_user_info(u_email)
-#         elif service == "hipchat":
-#             res["hipchat"] = hc.get_user_info(u_email)
-#     return res
+    def all_priveliges(self, u_email):
+        res = {}
+        for k, v in self.services.iteritems():
+            res[k] = v.get_user(u_email)
+        return res
