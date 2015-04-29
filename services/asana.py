@@ -14,6 +14,12 @@ class Asana():
         res = json.loads(r.text)
         return [res["name"] for res in res["data"]]
 
+    def get_user(self, user):
+        url = "{}users/{}".format(self.endpoint, user)
+        auth = self.auth_token
+        r = requests.get(url, auth=(auth, ""))
+        return json.loads(r.text)["data"]
+
     def all_workspaces(self):
         url = "{}workspaces".format(self.endpoint)
         auth = self.auth_token
