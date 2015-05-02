@@ -1,8 +1,9 @@
 import cmd
 import os.path
+import time
 
 from prettytable import PrettyTable
-from cmd_display import generate_table
+from cmd_display import generate_table, table_contents_to_s
 import pprint
 import yaml
 
@@ -71,9 +72,7 @@ class Unaccountable(cmd.Cmd):
             return
 
         res = self.multi_q.is_user_admin(cmds[0])
-        for k in res:
-            res[k] = [str(res[k])]
-        print generate_table(res)
+        print generate_table(table_contents_to_s(res))
 
     def do_user_manifest(self, arg):
         cmds = arg.split()
@@ -91,11 +90,7 @@ class Unaccountable(cmd.Cmd):
 
         elif "@" in cmds[0]:
             res = self.multi_q.is_user(cmds[0])
-
-            # convert values to lists with strings, move this out to table_helpers
-            for k in res:
-                res[k] = [str(res[k])]
-            print generate_table(res)
+            print generate_table(table_contents_to_s(res))
 
         # maybe check for 2 more args to support search by name?
 
@@ -112,11 +107,19 @@ class Unaccountable(cmd.Cmd):
 
     def do_create_user(self, arg):
         cmds = arg.split()
-        if len(cmds) == 0 or cmds[0] != "google" or "hipchat":
-            print("Please specify a valid service")
+        print cmds[0]
+        if len(cmds) == 0 or cmds[0] not in ["google", "hipchat"]:
+            print("Please specify a valid service (google or hipchat)")
             return
-
-        service = self.services[cmds[0]]
+        else:
+            service = self.services[cmds[0]]
+            template = service.generate_user_template()
+            service.create_user(template)
+            # to give time for a query
+            time.sleep(5)
+            print "fetching new user data "
+            pprint.pprint(service.get_user(template["primaryEmail"]))
+            print "exiting..."
 
     def do_configure(self, arg):
         # TODO: clean this up a little, ensure it writes strings as strings
@@ -178,32 +181,34 @@ class Unaccountable(cmd.Cmd):
             else:
                 print "Sorry, there is no record of a " + str(user) + " account in hipchat"
 
-    def do_create_user(self, arg):
-        print "Which service would you like to create an account for?"
-        print "Google, Slack, Hipchat, Jira"
-        service = raw_input("> ")
-        if service.lower() == "google":
-            import google_create as gc
+    # def do_create_user(self, arg):
+    #     print "Which service would you like to create an account for?"
+    #     print "Google, Slack, Hipchat, Jira"
+    #     service = raw_input("> ")
+    #     if service.lower() == "google":
+    #         import google_create as gc
+    # 
+    #         print "Would you like a user set up with default parameters, or custom?"
+    #         choice = raw_input("> ")
+    #         if choice.lower() == "default":
+    #             print "Please enter the user's first and last name:"
+    #             user_name = raw_input("> ")
+    #             gc.create_user(user_name)
+    #         elif choice.lower() == "custom":
+    #             return
+    #         else:
+    #             print "Error: please enter a valid service."
+    # 
+    #     elif service.lower() == "slack":
+    #         print "Slack does not currently support account creation features via their API :("
+    # 
+    #     elif service.lower() == "hipchat":
+    #         return
+    # 
+    #     elif service.lower() == "jira":
+    #         return
 
-            print "Would you like a user set up with default parameters, or custom?"
-            choice = raw_input("> ")
-            if choice.lower() == "default":
-                print "Please enter the user's first and last name:"
-                user_name = raw_input("> ")
-                gc.create_user(user_name)
-            elif choice.lower() == "custom":
-                return
-            else:
-                print "Error: please enter a valid service."
-
-        elif service.lower() == "slack":
-            print "Slack does not currently support account creation features via their API :("
-
-        elif service.lower() == "hipchat":
-            return
-
-        elif service.lower() == "jira":
-            return
+# ------------------------ASANA SPECIFIC CMDS------------------------
 
     def do_get_tasks(self, arg):
         cmds = arg.split()

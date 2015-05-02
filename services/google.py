@@ -51,59 +51,112 @@ class Google():
         except:
             return False
 
+    def generate_user_template(self):
+        print "Please enter the user's first and last name: "
+        user = raw_input("> ")
+        template = self.generate_user_template_from_name(user)
+        print ""
+        pprint.pprint(template)
+        print ""
+        print "Is this ok? y/n"
+        yn = raw_input("> ")
+        if yn.lower() == "y":
+            return template
+        elif yn.lower() == "n":
+            print "generating custom template"
+            custom_template = self.generate_user_template_interactive(user)
+            while custom_template is None:
+                custom_template = self.generate_user_template_interactive(user)
+            else:
+                return custom_template
+
+    def generate_user_template_interactive(self, user):
+        print "Please enter the user's default password"
+        pw = raw_input("> ")
+        print "Please enter the user's email address"
+        email = raw_input("> ")
+
+        template = {
+                    "primaryEmail": email,
+                    "name": {
+                             "givenName": user.split()[0],
+                             "familyName": user.split()[1],
+                             "fullName": user,
+                            },
+                    "password": pw,
+                    "changePasswordAtNextLogin": True,
+                    "agreedToTerms": False
+                   }
+
+        print ""
+        pprint.pprint(template)
+        print ""
+        print "Is this ok? y/n"
+        yn = raw_input("> ")
+        if yn.lower() == "y":
+            return template
+        elif yn.lower() == "n":
+            return
+
+    def generate_user_template_from_name(self, user):
+        template = {
+                    "primaryEmail": user.split()[0].lower() + "@" + self.domain,
+                    "name": {
+                             "givenName": user.split()[0],
+                             "familyName": user.split()[1],
+                             "fullName": user
+                            },
+                    "password": self.user_pass,
+                    "changePasswordAtNextLogin": True,
+                    "agreedToTerms": False
+                   }
+        return template
+
     def create_user(self, user):
-        """
-        creates a user account, along with firstnamelastname@[domain_name] and
-        firstname.lastname@[domain_name] aliases (if available) and adds them to a
-        default group
-        - user: string, user to be created, first name and last name separated by
-        whitespace
-        - group: list, groups user to be added to
-        - domain_name: string, email domain, e.g 'greatemail.com'
-        """
-        print "Generating user template"
-        user_settings = generate_user_template(user)
-        create_user = self.directory_api.users().insert(body=user_settings)
+        print "ensuring email address is not already taken"
 
-        print "Generating default aliases"
-        desired_aliases = generate_aliases(user)
-        print "Validating aliases"
-        valid_aliases = [validate_email(email, all_user_emails()) for email in desired_aliases if validate_email(email, all_user_emails()) is not None]
-        create_user.execute()
+        desired = user["primaryEmail"]
+        invalid = self.all_user_emails()
+        if self.validate_email(desired, invalid):
+            print "creating user based off this template"
+            print ""
+            pprint.pprint(user)
+            print ""
+            print "creating user"
+            self.directory_api.users().insert(body=user).execute()
+            print "user created"
+        else:
+            print "email address is taken, exiting..."
 
-        # New accounts do not appear immediately
-        print "User created, sleeping for 5 seconds..."
-        time.sleep(5)
-        print str(user) + "created"
-        print "Adding aliases..."
-        add_aliases(user.split()[0].lower() + "@" + self.domain, valid_aliases)
-        print "Aliases created"
-        print "Account creation finished, printing results"
-        pprint.pprint(get_user_info(user.split()[0].lower() + "@" + self.domain))
-
-    # Move everything below here out to somewhere
-    def generate_user_template(self, user, pw=None):
-        """
-        generates user template json necesssary to create a new user account
-        - user: string, user's first and last name separated by whitespace
-        - domain_name: string, email domain, e.g 'greatemail.com'
-        - pass: string, default password for email account
-        """
-        if pw is None:
-            pw = self.user_pass
-
-        json = {
-                "primaryEmail": user.split()[0].lower() + "@" + self.domain,
-                "name": {
-                         "givenName": user.split()[0],
-                         "familyName": user.split()[1],
-                         "fullName": user
-                        },
-                "password": pw,
-                "changePasswordAtNextLogin": True,
-                "agreedToTerms": False
-                }
-        return json
+    # def create_user(self, user):
+    #     """
+    #     creates a user account, along with firstnamelastname@[domain_name] and
+    #     firstname.lastname@[domain_name] aliases (if available) and adds them to a
+    #     default group
+    #     - user: string, user to be created, first name and last name separated by
+    #     whitespace
+    #     - group: list, groups user to be added to
+    #     - domain_name: string, email domain, e.g 'greatemail.com'
+    #     """
+    #     print "Generating user template"
+    #     user_settings = generate_user_template(user)
+    #     create_user = self.directory_api.users().insert(body=user_settings)
+    # 
+    #     print "Generating default aliases"
+    #     desired_aliases = generate_aliases(user)
+    #     print "Validating aliases"
+    #     valid_aliases = [validate_email(email, all_user_emails()) for email in desired_aliases if validate_email(email, all_user_emails()) is not None]
+    #     create_user.execute()
+    # 
+    #     # New accounts do not appear immediately
+    #     print "User created, sleeping for 5 seconds..."
+    #     time.sleep(5)
+    #     print str(user) + "created"
+    #     print "Adding aliases..."
+    #     add_aliases(user.split()[0].lower() + "@" + self.domain, valid_aliases)
+    #     print "Aliases created"
+    #     print "Account creation finished, printing results"
+    #     pprint.pprint(get_user_info(user.split()[0].lower() + "@" + self.domain))
 
     def validate_email(self, email, unavailable_emails):
         """
