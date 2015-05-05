@@ -115,10 +115,9 @@ class Unaccountable(cmd.Cmd):
             service = self.services[cmds[0]]
             template = service.generate_user_template()
             service.create_user(template)
-            # to give time for a query
             time.sleep(5)
             print "fetching new user data "
-            pprint.pprint(service.get_user(template["primaryEmail"]))
+            # pprint.pprint(service.get_user(template["primaryEmail"]))
             print "exiting..."
 
     def do_configure(self, arg):
@@ -144,42 +143,42 @@ class Unaccountable(cmd.Cmd):
 
     # Can combine all of these list and get_user_info functions
 
-    def do_edit_user(self, arg):
-        print "Which service would you like to edit an account for?"
-        print "Google, Slack, Hipchat, Jira"
-        service = raw_input("> ")
-        if service.lower() == "google":
-            import google_create as gc
-
-            print "Please enter the user's email address:"
-            user_email = raw_input("> ")
-            print "Fetching " + user_email + "'s details..."
-            if gc.get_user_info(user_email):
-                pprint.pprint(gc.get_user_info(user_email))
-            else:
-                print "Sorry, there is no record of a " + str(user) + " account in google"
-
-        elif service.lower() == "slack":
-            import slack_create as sc
-
-            print "Please enter the user's email address:"
-            user_email = raw_input("> ")
-            print "Fetching " + user_email + "'s details..."
-            if sc.get_user_info(user_email):
-                pprint.pprint(sc.get_user_info(user_email))
-            else:
-                print "Sorry, there is no record of a " + str(user) + " account in slack"
-
-        elif service.lower() == "hipchat":
-            import hipchat_create as hc
-
-            print "Please enter the user's email address:"
-            user_email = raw_input("> ")
-            print "Fetching " + user_email + "'s details..."
-            if hc.get_user_info(user_email):
-                pprint.pprint(hc.get_user_info(user_email))
-            else:
-                print "Sorry, there is no record of a " + str(user) + " account in hipchat"
+    # def do_edit_user(self, arg):
+    #     print "Which service would you like to edit an account for?"
+    #     print "Google, Slack, Hipchat, Jira"
+    #     service = raw_input("> ")
+    #     if service.lower() == "google":
+    #         import google_create as gc
+    # 
+    #         print "Please enter the user's email address:"
+    #         user_email = raw_input("> ")
+    #         print "Fetching " + user_email + "'s details..."
+    #         if gc.get_user_info(user_email):
+    #             pprint.pprint(gc.get_user_info(user_email))
+    #         else:
+    #             print "Sorry, there is no record of a " + str(user) + " account in google"
+    # 
+    #     elif service.lower() == "slack":
+    #         import slack_create as sc
+    # 
+    #         print "Please enter the user's email address:"
+    #         user_email = raw_input("> ")
+    #         print "Fetching " + user_email + "'s details..."
+    #         if sc.get_user_info(user_email):
+    #             pprint.pprint(sc.get_user_info(user_email))
+    #         else:
+    #             print "Sorry, there is no record of a " + str(user) + " account in slack"
+    # 
+    #     elif service.lower() == "hipchat":
+    #         import hipchat_create as hc
+    # 
+    #         print "Please enter the user's email address:"
+    #         user_email = raw_input("> ")
+    #         print "Fetching " + user_email + "'s details..."
+    #         if hc.get_user_info(user_email):
+    #             pprint.pprint(hc.get_user_info(user_email))
+    #         else:
+    #             print "Sorry, there is no record of a " + str(user) + " account in hipchat"
 
     # def do_create_user(self, arg):
     #     print "Which service would you like to create an account for?"
