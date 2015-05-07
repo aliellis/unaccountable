@@ -162,7 +162,11 @@ class Hipchat():
                     possible_matches.append(str(name["id"]))
         return possible_matches
 
-    def get_all_rooms():
+    def add_to_group():
+        return
+
+    def all_groups(self):
+        # get all rooms, this is just syntax to work with main
         url = self.endpoint + "room?auth_token=" + self.auth_token + "&private-room=true"
         request = urllib2.Request(url)
         response = urllib2.urlopen(request)
@@ -177,3 +181,6 @@ class Hipchat():
         response = urllib2.urlopen(request)
         response = json.load(response)
         return [user["name"] for user in response["participants"]]
+
+    def get_user_groups(self):
+        return

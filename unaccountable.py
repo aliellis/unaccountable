@@ -14,15 +14,6 @@ from services.asana import Asana
 from global_query import MultiQuery
 
 
-class Colours:
-    PINK = '\033[95m'
-    BLUE = '\033[94m'
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    RED = '\033[31m'
-    END = '\033[0m'
-
-
 class Unaccountable(cmd.Cmd):
     prompt = "unaccountable: "
 
@@ -32,7 +23,7 @@ class Unaccountable(cmd.Cmd):
         config = open("config.yml", "r")
         config = yaml.load(config)
 
-        # TODO: we should probably auto load these
+        # TODO: auto load these
         self.services = {
             "hipchat": Hipchat(config),
             "slack": Slack(config),
@@ -56,6 +47,7 @@ class Unaccountable(cmd.Cmd):
         self.prompt = arg
 
     def do_get_users(self, arg):
+        # yes: google, asana, slack, hipchat
         cmds = arg.split()
         if len(cmds) == 0 or cmds[0] not in self.services:
             print("Please specify a valid service")
@@ -66,6 +58,7 @@ class Unaccountable(cmd.Cmd):
         print(generate_table(users))
 
     def do_is_admin(self, arg):
+        # yes: google, slack, hipchat
         cmds = arg.split()
         if len(cmds) == 0:
             print("Please enter a valid email address")
@@ -74,7 +67,39 @@ class Unaccountable(cmd.Cmd):
         res = self.multi_q.is_user_admin(cmds[0])
         print generate_table(table_contents_to_s(res))
 
+    def do_get_groups(self, arg):
+        # yes: slack, google, asana
+        # no: hipchat
+        cmds = arg.split()
+        if len(cmds) == 0:
+            print("Please specify a valid service")
+
+        elif len(cmds) == 2:
+            service = self.services[cmds[0]]
+            user = cmds[1]
+            groups = {"Groups": service.get_user_groups(user)}
+            print(generate_table(groups))
+
+        elif cmds[0] not in self.services:
+            print("Please specify a valid service")
+
+        else:
+            service = self.services[cmds[0]]
+            groups = {"Groups": service.all_groups()}
+            print(generate_table(groups))
+
+    def do_add_to_group(self, arg):
+        # yes: slack, google
+        # no: asana
+        cmds = arg.split()
+        service = self.services[cmds[0]]
+        user = cmds[1]
+        group = cmds[2]
+
+        service.add_to_group(user, group)
+
     def do_user_manifest(self, arg):
+        # yes: google, slack, hipchat, asana
         cmds = arg.split()
         if len(cmds) == 0:
             print("Please specify a valid service or email address")
@@ -82,17 +107,34 @@ class Unaccountable(cmd.Cmd):
 
         pprint.pprint(self.multi_q.all_priveliges(cmds[0]))
 
+    def do_get_members(self, arg):
+        cmds = arg.split()
+        if len(cmds) < 2:
+            print("Please specify a valid service and group")
+        else:
+            service = self.services[cmds[0]]
+            group = cmds[1]
+
+            service.get_members(group)
+
+            # print generate_table(service.get_members(group))
+
+
     def do_get_user(self, arg):
+        # yes: slack, google, asana, hipchat
         cmds = arg.split()
         if len(cmds) == 0:
             print("Please specify a valid service or email address")
             return
 
+        elif len(cmds) == 2:
+            service = self.services[cmds[0]]
+            user = cmds[1]
+            pprint.pprint(service.get_user(user))
+
         elif "@" in cmds[0]:
             res = self.multi_q.is_user(cmds[0])
             print generate_table(table_contents_to_s(res))
-
-        # maybe check for 2 more args to support search by name?
 
         elif cmds[0] not in self.services:
             print("Please specify a valid service")
@@ -106,6 +148,8 @@ class Unaccountable(cmd.Cmd):
                 pprint.pprint(service.get_user(user))
 
     def do_create_user(self, arg):
+        # yes: google, hipchat
+        # no: slack, asana
         cmds = arg.split()
         print cmds[0]
         if len(cmds) == 0 or cmds[0] not in ["google", "hipchat"]:
@@ -115,10 +159,10 @@ class Unaccountable(cmd.Cmd):
             service = self.services[cmds[0]]
             template = service.generate_user_template()
             service.create_user(template)
-            time.sleep(5)
-            print "fetching new user data "
+            # time.sleep(5)
+            # print "fetching new user data "
             # pprint.pprint(service.get_user(template["primaryEmail"]))
-            print "exiting..."
+            # print "exiting..."
 
     def do_configure(self, arg):
         # TODO: clean this up a little, ensure it writes strings as strings
@@ -140,8 +184,6 @@ class Unaccountable(cmd.Cmd):
         else:
             generate_config()
             print "config.yml created"
-
-    # Can combine all of these list and get_user_info functions
 
     # def do_edit_user(self, arg):
     #     print "Which service would you like to edit an account for?"
@@ -180,32 +222,6 @@ class Unaccountable(cmd.Cmd):
     #         else:
     #             print "Sorry, there is no record of a " + str(user) + " account in hipchat"
 
-    # def do_create_user(self, arg):
-    #     print "Which service would you like to create an account for?"
-    #     print "Google, Slack, Hipchat, Jira"
-    #     service = raw_input("> ")
-    #     if service.lower() == "google":
-    #         import google_create as gc
-    # 
-    #         print "Would you like a user set up with default parameters, or custom?"
-    #         choice = raw_input("> ")
-    #         if choice.lower() == "default":
-    #             print "Please enter the user's first and last name:"
-    #             user_name = raw_input("> ")
-    #             gc.create_user(user_name)
-    #         elif choice.lower() == "custom":
-    #             return
-    #         else:
-    #             print "Error: please enter a valid service."
-    # 
-    #     elif service.lower() == "slack":
-    #         print "Slack does not currently support account creation features via their API :("
-    # 
-    #     elif service.lower() == "hipchat":
-    #         return
-    # 
-    #     elif service.lower() == "jira":
-    #         return
 
 # ------------------------ASANA SPECIFIC CMDS------------------------
 
@@ -218,22 +234,19 @@ class Unaccountable(cmd.Cmd):
             task_ids = [task_id["id"] for task_id in self.services["asana"].get_task_ids(cmds[0])["data"]]
             pprint.pprint([self.services["asana"].get_task_info(t)["data"] for t in task_ids])
 
-    def do_get_teams(self, arg):
-        print [team["name"] for team in self.services["asana"].get_teams()["data"]]
-
-    def do_get_members(self, arg):
-        cmds = arg.split()
-        if len(cmds) == 0:
-            print("Please specify a Asana team")
-            return
-        else:
-            raw_teams = self.services["asana"].get_teams()["data"]
-            for team in raw_teams:
-                if cmds[0] in team["name"]:
-                    team_id = team["id"]
-
-                    raw_users = self.services["asana"].get_team_members(team_id)["data"]
-                    print [user["name"] for user in raw_users]
+    # def do_get_members(self, arg):
+    #     cmds = arg.split()
+    #     if len(cmds) == 0:
+    #         print("Please specify a Asana team")
+    #         return
+    #     else:
+    #         raw_teams = self.services["asana"].get_teams()["data"]
+    #         for team in raw_teams:
+    #             if cmds[0] in team["name"]:
+    #                 team_id = team["id"]
+    # 
+    #                 raw_users = self.services["asana"].get_team_members(team_id)["data"]
+    #                 print [user["name"] for user in raw_users]
 
 
 if __name__ == "__main__":

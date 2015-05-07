@@ -1,6 +1,7 @@
 import json
 import urllib2
 import yaml
+import pprint
 
 # import urllib
 # import urlparse
@@ -43,3 +44,44 @@ class Slack():
                 return True
         except:
             False
+
+    def all_groups_raw(self):
+        url = "{}channels.list?token={}".format(self.endpoint, self.auth_token)
+        request = urllib2.Request(url)
+        response = urllib2.urlopen(request)
+        return json.load(response)
+
+    def get_user_groups(self, u_email):
+        if self.get_user(u_email)["id"]:
+            user_id = self.get_user(u_email)["id"]
+            all_groups = self.all_groups_raw()["channels"]
+            groups = []
+
+            for group in all_groups:
+                if user_id in group["members"]:
+                    print group["name"]
+                    groups.append(group["name"])
+
+        if groups:
+            return groups
+        else:
+            print "sorry, {} is not in any groups".format(u_email)
+
+    def all_groups(self):
+        groups = self.all_groups_raw()
+        return [group["name"] for group in groups["channels"]]
+
+    def get_group_id(self, group_name):
+        for group in self.all_groups_raw()["channels"]:
+            if group_name in group["name"]:
+                return group["id"]
+
+    def add_to_group(self, u_email, group):
+        if self.get_group_id(group):
+            group_id = self.get_group_id(group)
+            if self.get_user(u_email)["id"]:
+                user_id = self.get_user(u_email)["id"]
+                url = "{}channels.invite?token={}&channel={}&user={}".format(self.endpoint, self.auth_token, group_id, user_id)
+                print "sending request for {} to join {}".format(u_email, group)
+                urllib2.Request(url)
+                print "request sent"

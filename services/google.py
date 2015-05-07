@@ -129,19 +129,6 @@ class Google():
             print "email address is taken, exiting..."
 
     # def create_user(self, user):
-    #     """
-    #     creates a user account, along with firstnamelastname@[domain_name] and
-    #     firstname.lastname@[domain_name] aliases (if available) and adds them to a
-    #     default group
-    #     - user: string, user to be created, first name and last name separated by
-    #     whitespace
-    #     - group: list, groups user to be added to
-    #     - domain_name: string, email domain, e.g 'greatemail.com'
-    #     """
-    #     print "Generating user template"
-    #     user_settings = generate_user_template(user)
-    #     create_user = self.directory_api.users().insert(body=user_settings)
-    # 
     #     print "Generating default aliases"
     #     desired_aliases = generate_aliases(user)
     #     print "Validating aliases"
@@ -201,3 +188,37 @@ class Google():
         """
         for als in aliases:
             service.users().aliases().insert(userKey=user, body={"alias": als}).execute()
+
+    def all_groups(self):
+        req = self.directory_api.groups().list(domain=self.domain, maxResults=500).execute()
+
+        page_token = ""
+        groups = []
+
+        for group in req["groups"]:
+            groups.append(group["email"])
+
+        if req["nextPageToken"]:
+            page_token = req["nextPageToken"]
+
+        while page_token:
+            req2 = self.directory_api.groups().list(domain=self.domain, maxResults=500, pageToken=page_token).execute()
+            for group in req2["groups"]:
+                groups.append(group["email"])
+            page_token = ""
+            if "nextPageToken" in req2:
+                page_token = req2["nextPageToken"]
+
+        else:
+            return groups
+
+    def get_user_groups_raw(self, user):
+        return self.directory_api.groups().list(domain=self.domain, userKey=user).execute()
+
+    def get_user_groups(self, user):
+        req = self.directory_api.groups().list(domain=self.domain, userKey=user).execute()
+        return [group["email"] for group in req["groups"]]
+
+    def add_to_group(self, user, group):
+        template = {"email": user}
+        self.directory_api.members().insert(body=template, groupKey=group).execute()
