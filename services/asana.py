@@ -62,15 +62,14 @@ class Asana():
 
     def get_members(self, group):
         team_members = self.get_all_team_members()
-        groups = []
         if group in team_members:
+            groups = []
             group_ids = [user["id"] for user in team_members[group]]
             for g_id in group_ids:
                 groups.append(self.get_user(g_id)["email"])
+            return groups
         else:
             print "sorry, {} does not exist".format(group)
-
-        # return
 
     # def get_team_members(self, team_id):
     #     url = "{}teams/{}/users".format(self.endpoint, team_id)
@@ -106,4 +105,4 @@ class Asana():
             print "sorry, {} is not a part of any groups".format(user)
 
     def all_groups(self):
-        return [team["name"] for team in self.get_teams()["data"]]
+        return [team["name"].lower() for team in self.get_teams()["data"]]
