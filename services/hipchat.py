@@ -25,7 +25,7 @@ class Hipchat():
 
     # Can probably remove this when we port over to requests
     # Necessary to handle white space in get_user_info requests
-    def url_fix(s, charset='utf-8'):
+    def url_fix(self, s, charset='utf-8'):
         """Grabbed from http://stackoverflow.com/questions/120951/how-can-i-normalize-a-url-in-python"""
         if isinstance(s, unicode):
             s = s.encode(charset, 'ignore')
@@ -174,9 +174,15 @@ class Hipchat():
         response = response["items"]
         return [room["name"] for room in response]
 
-    def get_room_members(group):
-        url = self.endpoint + "room/" + group + "?auth_token=" + self.auth_token
-        url = url_fix(url)
+    def all_groups_raw(self):
+        url = self.endpoint + "room?auth_token=" + self.auth_token + "&private-room=true"
+        request = urllib2.Request(url)
+        response = urllib2.urlopen(request)
+        return json.load(response)
+
+    def get_room_members(self, group):
+        url = self.endpoint + "room/" + str(group) + "?auth_token=" + self.auth_token
+        url = self.url_fix(url)
         request = urllib2.Request(url)
         response = urllib2.urlopen(request)
         response = json.load(response)
@@ -184,3 +190,15 @@ class Hipchat():
 
     def get_user_groups(self):
         return
+
+    def get_group(self, g_id):
+        url = self.endpoint + "group?auth_token=" + self.auth_token + "&id=" + g_id
+        request = urllib2.Request(url)
+        response = urllib2.urlopen(request)
+        return json.load(response)
+
+    def get_members(self, group):
+        all_rooms = self.all_groups_raw()["items"]
+        for room in all_rooms:
+            if group in room["name"].lower():
+                return self.get_room_members(room["id"])
