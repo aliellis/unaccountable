@@ -222,3 +222,9 @@ class Google():
     def add_to_group(self, user, group):
         template = {"email": user}
         self.directory_api.members().insert(body=template, groupKey=group).execute()
+
+    def get_members_raw(self, group):
+        return self.directory_api.members().list(groupKey=group).execute()
+
+    def get_members(self, group):
+        return [user["email"] for user in self.get_members_raw(group)["members"]]

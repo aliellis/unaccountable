@@ -59,6 +59,7 @@ class Unaccountable(cmd.Cmd):
 
     def do_is_admin(self, arg):
         # yes: google, slack, hipchat
+        # no: asana
         cmds = arg.split()
         if len(cmds) == 0:
             print("Please enter a valid email address")
@@ -108,17 +109,19 @@ class Unaccountable(cmd.Cmd):
         pprint.pprint(self.multi_q.all_priveliges(cmds[0]))
 
     def do_get_members(self, arg):
+        # yes: google, slack, asana
         cmds = arg.split()
         if len(cmds) < 2:
             print("Please specify a valid service and group")
         else:
             service = self.services[cmds[0]]
-            group = cmds[1]
-
-            service.get_members(group)
-
-            # print generate_table(service.get_members(group))
-
+            cmds.pop(0)
+            group = ""
+            for i in cmds:
+                group += i + " "
+            group = group.strip().lower()
+            members = {group: service.get_members(group)}
+            print generate_table(members)
 
     def do_get_user(self, arg):
         # yes: slack, google, asana, hipchat
@@ -129,20 +132,20 @@ class Unaccountable(cmd.Cmd):
 
         elif len(cmds) == 2:
             service = self.services[cmds[0]]
-            user = cmds[1]
+            user = cmds[1].lower()
             pprint.pprint(service.get_user(user))
 
         elif "@" in cmds[0]:
-            res = self.multi_q.is_user(cmds[0])
+            res = self.multi_q.is_user(cmds[0].lower())
             print generate_table(table_contents_to_s(res))
 
         elif cmds[0] not in self.services:
             print("Please specify a valid service")
 
         else:
-            service = self.services[cmds[0]]
+            service = self.services[cmds[0].lower()]
             if len(cmds) > 1:
-                pprint.pprint(service.get_user(cmds[1]))
+                pprint.pprint(service.get_user(cmds[1].lower()))
             else:
                 user = raw_input("Please enter a valid email address: ")
                 pprint.pprint(service.get_user(user))

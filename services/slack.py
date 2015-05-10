@@ -85,3 +85,28 @@ class Slack():
                 print "sending request for {} to join {}".format(u_email, group)
                 urllib2.Request(url)
                 print "request sent"
+
+    def get_members_raw(self, group):
+        all_channels = self.all_groups_raw()["channels"]
+        for channel in all_channels:
+            if channel["name"] == group:
+                url = "{}channels.info?token={}&channel={}".format(self.endpoint, self.auth_token, channel["id"])
+                request = urllib2.Request(url)
+                response = urllib2.urlopen(request)
+                return json.load(response)
+
+    def get_user_with_id(self, u_id):
+        url = "{}users.info?token={}&user={}".format(self.endpoint, self.auth_token, u_id)
+        request = urllib2.Request(url)
+        response = urllib2.urlopen(request)
+        return json.load(response)
+
+    def get_members(self, group):
+        raw = self.get_members_raw(group)
+        member_ids = raw["channel"]["members"]
+        u_emails = []
+        for u_id in member_ids:
+            user = self.get_user_with_id(u_id)["user"]
+            if user["deleted"] is False and user["is_bot"] is False:
+                u_emails.append(self.get_user_with_id(u_id)["user"]["profile"]["email"])
+        return u_emails
