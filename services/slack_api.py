@@ -1,26 +1,16 @@
 class SlackAPI():
     def __init__(self, config):
-    # def __init__(self):
         self.endpoint = "https://slack.com/api/"
         self.auth_token = config["slack_auth_token"]
-        # self.auth_token = "testauthtoken"
 
-    def url_constructor(self, method, action, params=None):
-        if params is None:
-            return "{}{}.{}?token={}".format(self.endpoint, method, action,
-                                             self.auth_token)
-        else:
-            url = "{}{}.{}?token={}".format(self.endpoint, method, action,
-                                            self.auth_token)
-            for i in params:
-                url += "&{}={}".format(i, params[i])
-
-            return url
+    def constructor(self, method, action):
+        return "{}{}.{}?token={}".format(
+                    self.endpoint, method, action, self.auth_token)
 
     def generate_urls(self, method, actions):
         root_urls = {}
         for i in actions:
-            root_urls[i] = self.url_constructor(method, i)
+            root_urls[i] = self.constructor(method, i)
         return root_urls
 
     def add_params(self, action, urls, params=None):
