@@ -6,17 +6,20 @@ import pprint
 # import urllib
 # import urlparse
 
+from slack_api import SlackAPI
 
 class Slack():
     def __init__(self, config):
         self.endpoint = "https://slack.com/api/"
         self.auth_token = config["slack_auth_token"]
+        self.config = config
 
     def all_users(self):
         # slack has a lot of inconsistencies in their json structure, can investigate
         # further but it seems like most are optional, the most reliable form to get
         # real users (not bots) is to return entries with emails
-        url = "{}users.list?token={}".format(self.endpoint, self.auth_token)
+
+        url = SlackAPI(self.config).users("list")
         request = urllib2.Request(url)
         response = urllib2.urlopen(request)
         response = json.load(response)
@@ -29,7 +32,7 @@ class Slack():
     def get_user(self, u_email):
         # although slack has a get_user call, it requires their unique id which can
         # only be found through the users.list method >_>
-        url = "{}users.list?token={}".format(self.endpoint, self.auth_token)
+        url = SlackAPI(self.config).users("list")
         request = urllib2.Request(url)
         response = urllib2.urlopen(request)
         response = json.load(response)
@@ -46,7 +49,7 @@ class Slack():
             False
 
     def all_groups_raw(self):
-        url = "{}channels.list?token={}".format(self.endpoint, self.auth_token)
+        url = SlackAPI(self.config).users("list")
         request = urllib2.Request(url)
         response = urllib2.urlopen(request)
         return json.load(response)
@@ -80,7 +83,8 @@ class Slack():
             group_id = self.get_group_id(group)
             if self.get_user(u_email)["id"]:
                 user_id = self.get_user(u_email)["id"]
-                url = "{}channels.invite?token={}&channel={}&user={}".format(self.endpoint, self.auth_token, group_id, user_id)
+                params = {"channel": group_id, "user": user_id}
+                url = SlackAPI(self.config).channels("invite", params)
                 print "sending request for {} to join {}".format(u_email, group)
                 urllib2.Request(url)
                 print "request sent"
@@ -90,20 +94,23 @@ class Slack():
             group_id = self.get_group_id(group)
             if self.get_user(u_email)["id"]:
                 user_id = self.get_user(u_email)["id"]
-                url = "{}channels.kick?token={}&channel={}&user={}".format(self.endpoint, self.auth_token, group_id, user_id)
+                params = {"channel": group_id, "user": user_id}
+                url = SlackAPI(self.config).channels("kick", params)
                 urllib2.Request(url)
 
     def get_members_raw(self, group):
         all_channels = self.all_groups_raw()["channels"]
         for channel in all_channels:
             if channel["name"] == group:
-                url = "{}channels.info?token={}&channel={}".format(self.endpoint, self.auth_token, channel["id"])
+                params = {"channel": channel["id"]}
+                url = SlackAPI(self.config).users("info", params)
                 request = urllib2.Request(url)
                 response = urllib2.urlopen(request)
                 return json.load(response)
 
     def get_user_with_id(self, u_id):
-        url = "{}users.info?token={}&user={}".format(self.endpoint, self.auth_token, u_id)
+        params = {"user": u_id}
+        url = SlackAPI(self.config).users("info", params)
         request = urllib2.Request(url)
         response = urllib2.urlopen(request)
         return json.load(response)

@@ -12,7 +12,7 @@ from services.slack import Slack
 from services.google import Google
 from services.asana import Asana
 from global_query import MultiQuery
-from validate import validate_service, validate_user, validate_group
+from validate import validate_i_in_list, validate_user
 
 
 class Unaccountable(cmd.Cmd):
@@ -50,7 +50,7 @@ class Unaccountable(cmd.Cmd):
     def do_get_users(self, arg):
         """ get_users [service] """
         cmds = arg.split()
-        if validate_service(cmds[0], ["google", "asana", "slack", "hipchat"]):
+        if validate_i_in_list(cmds[0], ["google", "asana", "slack", "hipchat"]):
 
             service = self.services[cmds[0]]
             users = {"Users": service.all_users()}
@@ -81,7 +81,7 @@ class Unaccountable(cmd.Cmd):
     def do_add_to_group(self, arg):
         """ add_to_group [service] [user] [group] """
         cmds = arg.split()
-        if validate_service(cmds[0], ["google", "slack"]):
+        if validate_i_in_list(cmds[0], ["google", "slack"]):
 
             service = self.services[cmds[0]]
             user = cmds[1]
@@ -92,7 +92,7 @@ class Unaccountable(cmd.Cmd):
     def do_remove_from_group(self, arg):
         """ remove_from_group [service] [user] [group] """
         cmds = arg.split()
-        if validate_service(cmds[0], ["google", "slack"]):
+        if validate_i_in_list(cmds[0], ["google", "slack"]):
 
             service = self.services[cmds[0]]
             user = cmds[1]
@@ -111,7 +111,7 @@ class Unaccountable(cmd.Cmd):
     def do_get_members(self, arg):
         """ get_members [service] [group] """
         cmds = arg.split()
-        if validate_service(cmds[0], ["google", "slack", "asana", "hipchat"]):
+        if validate_i_in_list(cmds[0], ["google", "slack", "asana", "hipchat"]):
 
             service = self.services[cmds[0]]
             cmds.pop(0)
@@ -149,7 +149,7 @@ class Unaccountable(cmd.Cmd):
     def do_create_user(self, arg):
         """ create_user [service] [user] """
         cmds = arg.split()
-        if validate_service(cmds[0], ["google", "hipchat"]):
+        if validate_i_in_list(cmds[0], ["google", "hipchat"]):
 
             service = self.services[cmds[0]]
             template = service.generate_user_template()
