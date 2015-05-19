@@ -59,7 +59,6 @@ class Slack():
 
             for group in all_groups:
                 if user_id in group["members"]:
-                    print group["name"]
                     groups.append(group["name"])
 
         if groups:
@@ -85,6 +84,14 @@ class Slack():
                 print "sending request for {} to join {}".format(u_email, group)
                 urllib2.Request(url)
                 print "request sent"
+
+    def remove_from_group(self, u_email, group):
+        if self.get_group_id(group):
+            group_id = self.get_group_id(group)
+            if self.get_user(u_email)["id"]:
+                user_id = self.get_user(u_email)["id"]
+                url = "{}channels.kick?token={}&channel={}&user={}".format(self.endpoint, self.auth_token, group_id, user_id)
+                urllib2.Request(url)
 
     def get_members_raw(self, group):
         all_channels = self.all_groups_raw()["channels"]

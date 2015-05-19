@@ -4,7 +4,7 @@ import time
 
 from prettytable import PrettyTable
 from cmd_display import generate_table, table_contents_to_s
-import pprint
+from pprint import pprint
 import yaml
 
 from services.hipchat import Hipchat
@@ -12,6 +12,7 @@ from services.slack import Slack
 from services.google import Google
 from services.asana import Asana
 from global_query import MultiQuery
+from validate import validate_service, validate_user, validate_group
 
 
 class Unaccountable(cmd.Cmd):
@@ -47,73 +48,71 @@ class Unaccountable(cmd.Cmd):
         self.prompt = arg
 
     def do_get_users(self, arg):
-        # yes: google, asana, slack, hipchat
+        """ get_users [service] """
         cmds = arg.split()
-        if len(cmds) == 0 or cmds[0] not in self.services:
-            print("Please specify a valid service")
-            return
+        if validate_service(cmds[0], ["google", "asana", "slack", "hipchat"]):
 
-        service = self.services[cmds[0]]
-        users = {"Users": service.all_users()}
-        print(generate_table(users))
+            service = self.services[cmds[0]]
+            users = {"Users": service.all_users()}
+            print(generate_table(users))
 
     def do_is_admin(self, arg):
-        # yes: google, slack, hipchat
-        # no: asana
+        """ is_admin [user] """
         cmds = arg.split()
-        if len(cmds) == 0:
-            print("Please enter a valid email address")
-            return
+        if validate_user(cmds[0]):
 
-        res = self.multi_q.is_user_admin(cmds[0])
-        print generate_table(table_contents_to_s(res))
+            res = self.multi_q.is_user_admin(cmds[0])
+            print generate_table(table_contents_to_s(res))
 
     def do_get_groups(self, arg):
-        # yes: slack, google, asana
-        # no: hipchat
+        """ get_groups [service] [user] """
+        # yes: slack, google, asana,
         cmds = arg.split()
-        if len(cmds) == 0:
-            print("Please specify a valid service")
-
-        elif len(cmds) == 2:
+        if len(cmds) == 2:
             service = self.services[cmds[0]]
             user = cmds[1]
             groups = {"Groups": service.get_user_groups(user)}
             print(generate_table(groups))
-
-        elif cmds[0] not in self.services:
-            print("Please specify a valid service")
-
         else:
             service = self.services[cmds[0]]
             groups = {"Groups": service.all_groups()}
             print(generate_table(groups))
 
     def do_add_to_group(self, arg):
-        # yes: slack, google
-        # no: asana
+        """ add_to_group [service] [user] [group] """
         cmds = arg.split()
-        service = self.services[cmds[0]]
-        user = cmds[1]
-        group = cmds[2]
+        if validate_service(cmds[0], ["google", "slack"]):
 
-        service.add_to_group(user, group)
+            service = self.services[cmds[0]]
+            user = cmds[1]
+            group = cmds[2]
+
+            service.add_to_group(user, group)
+
+    def do_remove_from_group(self, arg):
+        """ remove_from_group [service] [user] [group] """
+        cmds = arg.split()
+        if validate_service(cmds[0], ["google", "slack"]):
+
+            service = self.services[cmds[0]]
+            user = cmds[1]
+            group = cmds[2]
+
+            print service.remove_from_group(user, group)
 
     def do_user_manifest(self, arg):
+        """ user_manifest [user] """
         # yes: google, slack, hipchat, asana
         cmds = arg.split()
-        if len(cmds) == 0:
-            print("Please specify a valid service or email address")
-            return
+        if validate_user(cmds[0]):
 
-        pprint.pprint(self.multi_q.all_priveliges(cmds[0]))
+            pprint(self.multi_q.all_priveliges(cmds[0]))
 
     def do_get_members(self, arg):
-        # yes: google, slack, asana
+        """ get_members [service] [group] """
         cmds = arg.split()
-        if len(cmds) < 2:
-            print("Please specify a valid service and group")
-        else:
+        if validate_service(cmds[0], ["google", "slack", "asana", "hipchat"]):
+
             service = self.services[cmds[0]]
             cmds.pop(0)
             group = ""
@@ -124,16 +123,13 @@ class Unaccountable(cmd.Cmd):
             print generate_table(members)
 
     def do_get_user(self, arg):
+        """ get_user [service] [user] """
         # yes: slack, google, asana, hipchat
         cmds = arg.split()
-        if len(cmds) == 0:
-            print("Please specify a valid service or email address")
-            return
-
-        elif len(cmds) == 2:
+        if len(cmds) == 2:
             service = self.services[cmds[0]]
             user = cmds[1].lower()
-            pprint.pprint(service.get_user(user))
+            pprint(service.get_user(user))
 
         elif "@" in cmds[0]:
             res = self.multi_q.is_user(cmds[0].lower())
@@ -145,29 +141,22 @@ class Unaccountable(cmd.Cmd):
         else:
             service = self.services[cmds[0].lower()]
             if len(cmds) > 1:
-                pprint.pprint(service.get_user(cmds[1].lower()))
+                pprint(service.get_user(cmds[1].lower()))
             else:
                 user = raw_input("Please enter a valid email address: ")
-                pprint.pprint(service.get_user(user))
+                pprint(service.get_user(user))
 
     def do_create_user(self, arg):
-        # yes: google, hipchat
-        # no: slack, asana
+        """ create_user [service] [user] """
         cmds = arg.split()
-        print cmds[0]
-        if len(cmds) == 0 or cmds[0] not in ["google", "hipchat"]:
-            print("Please specify a valid service (google or hipchat)")
-            return
-        else:
+        if validate_service(cmds[0], ["google", "hipchat"]):
+
             service = self.services[cmds[0]]
             template = service.generate_user_template()
             service.create_user(template)
-            # time.sleep(5)
-            # print "fetching new user data "
-            # pprint.pprint(service.get_user(template["primaryEmail"]))
-            # print "exiting..."
 
     def do_configure(self, arg):
+        """ configure """
         # TODO: clean this up a little, ensure it writes strings as strings
         # and ints as ints
         from generate_config import generate_config
@@ -199,7 +188,7 @@ class Unaccountable(cmd.Cmd):
     #         user_email = raw_input("> ")
     #         print "Fetching " + user_email + "'s details..."
     #         if gc.get_user_info(user_email):
-    #             pprint.pprint(gc.get_user_info(user_email))
+    #             pprint(gc.get_user_info(user_email))
     #         else:
     #             print "Sorry, there is no record of a " + str(user) + " account in google"
     # 
@@ -210,7 +199,7 @@ class Unaccountable(cmd.Cmd):
     #         user_email = raw_input("> ")
     #         print "Fetching " + user_email + "'s details..."
     #         if sc.get_user_info(user_email):
-    #             pprint.pprint(sc.get_user_info(user_email))
+    #             pprint(sc.get_user_info(user_email))
     #         else:
     #             print "Sorry, there is no record of a " + str(user) + " account in slack"
     # 
@@ -221,7 +210,7 @@ class Unaccountable(cmd.Cmd):
     #         user_email = raw_input("> ")
     #         print "Fetching " + user_email + "'s details..."
     #         if hc.get_user_info(user_email):
-    #             pprint.pprint(hc.get_user_info(user_email))
+    #             pprint(hc.get_user_info(user_email))
     #         else:
     #             print "Sorry, there is no record of a " + str(user) + " account in hipchat"
 
@@ -235,7 +224,7 @@ class Unaccountable(cmd.Cmd):
             return
         else:
             task_ids = [task_id["id"] for task_id in self.services["asana"].get_task_ids(cmds[0])["data"]]
-            pprint.pprint([self.services["asana"].get_task_info(t)["data"] for t in task_ids])
+            pprint([self.services["asana"].get_task_info(t)["data"] for t in task_ids])
 
     # def do_get_members(self, arg):
     #     cmds = arg.split()

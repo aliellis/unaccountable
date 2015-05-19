@@ -223,6 +223,10 @@ class Google():
         template = {"email": user}
         self.directory_api.members().insert(body=template, groupKey=group).execute()
 
+    def remove_from_group(self, user, group):
+        template = {"email": user}
+        self.directory_api.members().delete(groupKey=group, memberKey=user).execute()
+
     def get_members_raw(self, group):
         return self.directory_api.members().list(groupKey=group).execute()
 

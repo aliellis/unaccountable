@@ -188,9 +188,6 @@ class Hipchat():
         response = json.load(response)
         return [user["name"] for user in response["participants"]]
 
-    def get_user_groups(self):
-        return
-
     def get_group(self, g_id):
         url = self.endpoint + "group?auth_token=" + self.auth_token + "&id=" + g_id
         request = urllib2.Request(url)
